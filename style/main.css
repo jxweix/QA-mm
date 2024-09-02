@@ -3,6 +3,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #000000;
+  overflow: hidden;
 }
 
 .videoContainer {
@@ -21,17 +22,17 @@ body {
 }
 
 video {
-    height: 3200px;
+  height: 100vh;
 }
 
 .iframe {
   height: 32vh;
-  width: 1800px;
+  width: 75vh;
 }
 
 .grid {
   margin: 0;
-  padding-top: 5vh;
+  padding-top: 10vh;
 }
 
 .Bt-start {
