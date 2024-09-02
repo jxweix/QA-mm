@@ -26,8 +26,10 @@ video {
 }
 
 .iframe {
-  height: 32vh;
+  height: 35vh;
   width: 75vh;
+  overflow: hidden;
+  border: none;
 }
 
 .grid {
