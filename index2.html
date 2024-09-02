@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องเล่นวิดีโอ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000000;
+        }
+        #videoContainer {
+            width: 560px;
+            height: 1000px;
+            margin-left: 100px;
+            margin-right: auto;
+            background-color: rgb(255, 255, 255);
+        }
+        video {
+            width: 220%;
+            height: 220%;
+        }
+        button {
+            padding: 60px 100px;
+            font-size: 100px;
+            margin: 10px;
+            cursor: pointer;
+            position: relative;
+            top: 900px;
+            left: 15px;
+            border-radius: 20px;
+        }
+        #message {
+            font-size: 18px;
+            color: red;
+            position: relative;
+            top: 1000px;
+            left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>เครื่องเล่นวิดีโอ</h1>
+    <div id="videoContainer">
+        <video id="videoPlayer" >
+            <source id="videoSource" src="hello.mp4" type="video/mp4">
+            เบราว์เซอร์ของคุณไม่รองรับแท็กวิดีโอ
+        </video>
+    </div>
+    <button onclick="startListening()">เริ่มฟัง</button>
+    <p id="message"></p>
+
+    <script>
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        const message = document.getElementById('message');
+
+        const phraseToVideo = {
+            "น้ำตาล": "1.mp4",
+            "เกลือ": "2.mp4",
+            "ห้องน้ำ": "3.mp4",
+            "สมัครสมาชิก": "4.mp4"
+        };
+
+        let recognition;
+        let isListening = false;
+
+        function playVideo(videoFile) {
+            videoSource.src = videoFile;
+            videoPlayer.load();
+            videoPlayer.play();
+
+            // Show a popup if the video is '1.mp4'
+            if (videoFile === '1.mp4') {
+                showPopup();
+            }
+
+            // Stop listening when a video starts playing
+            if (isListening) {
+                recognition.stop();
+                isListening = false;
+                message.textContent = "หยุดฟังขณะเล่นวิดีโอ";
+            }
+        }
+
+        function showPopup() {
+            window.open('https://www.google.com', '_blank', 'width=600,height=400');
+        }
+
+        function startListening() {
+            playVideo('Wel.mp4');
+
+            videoPlayer.onended = () => {
+                listenForPhrase(15000); // ฟังเป็นเวลา 15 วินาที
+            };
+        }
+
+        function listenForPhrase(duration) {
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                message.textContent = "การรู้จำเสียงไม่รองรับในเบราว์เซอร์นี้";
+                return;
+            }
+
+            if (isListening) return; // ป้องกันการเริ่มต้นหลายครั้ง
+
+            message.textContent = "กำลังฟังคำพูด...";
+            isListening = true;
+
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'th-TH';
+            recognition.interimResults = false;
+
+            recognition.start();
+
+            const stopListeningTimeout = setTimeout(() => {
+                recognition.stop();
+                isListening = false;
+                message.textContent = "หยุดฟังหลังจาก 15 วินาที";
+            }, duration);
+
+            recognition.onresult = function(event) {
+                clearTimeout(stopListeningTimeout); // ยกเลิก timeout หากมีการรู้จำคำพูด
+
+                const transcript = event.results[0][0].transcript.trim();
+                console.log('ได้ยิน:', transcript);
+
+                let videoToPlay = null;
+                for (const phrase in phraseToVideo) {
+                    if (transcript.includes(phrase)) {
+                        videoToPlay = phraseToVideo[phrase];
+                        break;
+                    }
+                }
+
+                if (videoToPlay) {
+                    playVideo(videoToPlay);
+
+                    // ตั้งค่าวิดีโอที่จะแสดงเมื่อวิดีโอปัจจุบันเล่นจบ
+                    videoPlayer.onended = () => {
+                        if (videoToPlay === '1.mp4') {
+                            // Play Q.mp4 after 5 seconds
+                            setTimeout(() => {
+                                playVideo('Q.mp4');
+                                videoPlayer.onended = () => {
+                                    // Refresh the page after Q.mp4 finishes
+                                    if (videoSource.src.endsWith('Q.mp4')) {
+                                        location.reload(); // Refresh the page when 'Q.mp4' ends
+                                    }
+                                };
+                            }, 5000); // Delay for 5 seconds
+                        } else if (['no.mp4', 'Q.mp4'].includes(videoToPlay)) {
+                            recognition.stop(); // หยุดการรู้จำสำหรับวิดีโอเหล่านี้
+                            isListening = false;
+                            setTimeout(() => {
+                                // กลับมาฟังอีกครั้งหลังจากหยุด
+                                listenForPhrase(15000); // ฟังเป็นเวลา 15 วินาที
+                            }, 500); // ปรับเวลาหากจำเป็น
+                        } else {
+                            playVideo('Q.mp4');
+                        }
+                    };
+                } else {
+                    message.textContent = "ไม่พบคำพูดหรือไม่สามารถจับคู่กับวิดีโอได้";
+                    playVideo('no.mp4');
+                    // Refresh the page when 'no.mp4' finishes
+                    videoPlayer.onended = () => {
+                        if (videoSource.src.endsWith('no.mp4')) {
+                            location.reload(); // Refresh the page when 'no.mp4' ends
+                        } else {
+                            // Handle other videos
+                            playVideo('Q.mp4');
+                        }
+                    };
+                }
+            };
+
+            recognition.onerror = function(event) {
+                clearTimeout(stopListeningTimeout); // ยกเลิก timeout หากเกิดข้อผิดพลาด
+
+                console.error(event.error);
+                message.textContent = "เกิดข้อผิดพลาดกับบริการรู้จำเสียง";
+                
+                playVideo('no.mp4');
+                // Refresh the page when 'no.mp4' finishes
+                videoPlayer.onended = () => {
+                    if (videoSource.src.endsWith('no.mp4')) {
+                        location.reload(); // Refresh the page when 'no.mp4' ends
+                    } else {
+                        // Handle other videos
+                        playVideo('Q.mp4');
+                    }
+                };
+            };
+        }
+    </script>
+</body>
+</html>
