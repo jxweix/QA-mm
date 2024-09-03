@@ -16,8 +16,10 @@
         </video>
         <div class="container">
             <button class="Bt-start" onclick="startListening()">เริ่มฟัง</button>
-            <div class="grid">
-                <video class="iframe" autoplay muted loop src="makro.mp4"></video>
+            <div class="image-container">
+                <video class="item active" autoplay muted loop src="makro.mp4"></video>
+                <img class="item"
+                    src="https://photokiosk.my.canva.site/demo-suga/images/aa9382ec1381a9d9017dc0ac93d61876.png">
             </div>
         </div>
         <p id="message" hidden></p>
@@ -32,6 +34,14 @@
                 "เกลือ": "2.mp4",
                 "ห้องน้ำ": "3.mp4",
                 "สมัครสมาชิก": "4.mp4"
+            };
+
+            const phraseToImageIndex = {
+                "โฆษณา": 0,
+                "น้ำตาล": 1,
+                "เกลือ": 2,
+                "ห้องน้ำ": 3,
+                "สมัครสมาชิก": 4,
             };
 
             let recognition;
@@ -87,11 +97,26 @@
                     console.log('ได้ยิน:', transcript);
 
                     let videoToPlay = null;
+                    let imgindex = null;
                     for (const phrase in phraseToVideo) {
                         if (transcript.includes(phrase)) {
                             videoToPlay = phraseToVideo[phrase];
                             break;
                         }
+                    }
+                    for (const phrase in phraseToImageIndex) {
+                        if (transcript.includes(phrase)) {
+                            imgindex = phraseToImageIndex[phrase];
+                            showImage(imgindex)
+                            break;
+                        }
+                    }
+
+                    function showImage(index) {
+                        var images = document.querySelectorAll('.item');
+                        images.forEach(function (image, i) {
+                            image.classList.toggle('active', i === index);
+                        });
                     }
 
                     if (videoToPlay) {
