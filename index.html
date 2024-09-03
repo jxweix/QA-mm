@@ -18,8 +18,7 @@
             <button class="Bt-start" onclick="startListening()">เริ่มฟัง</button>
             <div class="image-container">
                 <video class="item active" autoplay muted loop src="makro.mp4"></video>
-                <img class="item"
-                    src="https://photokiosk.my.canva.site/demo-suga/images/aa9382ec1381a9d9017dc0ac93d61876.png">
+                <img class="item" src="suga.png">
             </div>
         </div>
         <p id="message" hidden></p>
@@ -60,7 +59,7 @@
             }
 
             function startListening() {
-                playVideo('Wel.mp4');
+                playVideo('hello.mp4');
 
                 videoPlayer.onended = () => {
                     listenForPhrase(15000); // ฟังเป็นเวลา 15 วินาที

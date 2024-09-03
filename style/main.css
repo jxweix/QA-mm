@@ -16,10 +16,8 @@ body {
 .container {
   bottom: 0;
   display: grid;
-  /* max-width: 1000px; */
-  height: 570px;
+  height: 41vh;
   position: absolute;
-  /* justify-items: center; */
 }
 
 video {
@@ -49,17 +47,18 @@ video {
 
 .image-container {
   margin: 0;
+  bottom: 0;
+  position: absolute;
   padding-top: 10vh;
 }
 
 .item {
-  position: absolute;
-  width: 75vh;
-  height: 32vh;
-  left: -37vh;
   bottom: 0;
-  object-fit: none;
-  object-position: top center;
+  width: 74vh;
+  height: 32vh;
+  object-fit: cover;
+  position: absolute;
+  left: -37vh;
   opacity: 0;
 }
 
